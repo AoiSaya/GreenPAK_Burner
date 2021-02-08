@@ -1,6 +1,6 @@
-# GreenPAK Burner for M5StickC(ESP32)
+# GreenPAK Burner for M5StickC & M5Stack (ESP32)
 
-This is a sketch of programming the GreenPAK SLG46826 with an M5StickC(ESP32 device)
+This is a sketch of programming the GreenPAK SLG46826 with an M5StickC & M5Stack(ESP32 device)
 
 # How to use
 
