@@ -1,4 +1,9 @@
+#if defined(ARDUINO_M5Stack_Core_ESP32)
+#include <M5Stack.h>
+#elif defined(ARDUINO_M5Stick_C)
 #include <M5StickC.h>
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,7 +28,11 @@ const char eepromData[] PROGMEM ="\
 ////////////////////////////////////////////////////////////////////////////////
 void setup() {
   M5.begin();
+#if defined(ARDUINO_M5Stack_Core_ESP32)
+  Wire.begin();  
+#elif defined(ARDUINO_M5Stick_C)
   Wire.begin(32, 33);  
+#endif
   Wire.setClock(100000);
   Serial.begin(115200);
   
