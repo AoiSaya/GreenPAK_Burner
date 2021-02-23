@@ -30,6 +30,9 @@ I thank driedell-san for publishing the original sketch.
 
 https://github.com/driedell/SLG46826_Programmer
 
+HThanks to Mr. Tanaka for the idea of supporting here documents.
+
+https://lang-ship.com/blog/work/greenpak-i2c-03-hex/
 
 # Author  
 [GitHub/AoiSaya](https://github.com/AoiSaya)  
