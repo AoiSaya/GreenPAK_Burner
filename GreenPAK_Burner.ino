@@ -17,11 +17,11 @@ bool device_present[16] = {false};
 uint8_t data_array[16][16] = {};
  
 // Store nvmData in PROGMEM to save on RAM
-const char nvmData[] PROGMEM ="\
-";
+const char nvmData[] PROGMEM = R"(
+)";
 // Store eepromData in PROGMEM to save on RAM
-const char eepromData[] PROGMEM ="\
-";
+const char eepromData[] PROGMEM = R"(
+)";
 
 ////////////////////////////////////////////////////////////////////////////////
 // setup 
@@ -40,7 +40,7 @@ void setup() {
   M5.Lcd.setCursor(0, 0, 4);
   M5.Lcd.print("GreenPAK\n");
   M5.Lcd.print("Burner\n");
-  M5.Lcd.print("ver.0.1");
+  M5.Lcd.print("ver.0.3");
   delay(100);
 }
 
