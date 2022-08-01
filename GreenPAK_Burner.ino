@@ -1,7 +1,13 @@
-#if defined(ARDUINO_M5Stack_Core_ESP32)
+#if defined(ARDUINO_M5Stack_Core_ESP32) || defined(ARDUINO_M5STACK_FIRE)
 #include <M5Stack.h>
 #elif defined(ARDUINO_M5Stick_C)
 #include <M5StickC.h>
+#elif defined(ARDUINO_M5Stick_C_PLUS)
+#include <M5StickCPlus.h>
+#elif defined(ARDUINO_M5STACK_Core2)
+#include <M5Core2.h>
+#elif defined(ARDUINO_M5Stack_ATOM)
+#include <M5Atom.h>
 #endif
 
 #include <stdlib.h>
@@ -28,11 +34,14 @@ const char eepromData[] PROGMEM = R"(
 ////////////////////////////////////////////////////////////////////////////////
 void setup() {
   M5.begin();
-#if defined(ARDUINO_M5Stack_Core_ESP32)
-  Wire.begin();  
-#elif defined(ARDUINO_M5Stick_C)
+#if defined(ARDUINO_M5Stack_Core_ESP32) || defined(ARDUINO_M5STACK_FIRE)
+  Wire.begin();  // 21,22  
+#elif defined(ARDUINO_M5Stick_C) || defined(ARDUINO_M5Stick_C_PLUS) || defined(ARDUINO_M5STACK_Core2)
   Wire.begin(32, 33);  
+#elif defined(ARDUINO_M5Stack_ATOM)
+  Wire.begin(26, 32);  
 #endif
+
   Wire.setClock(100000);
   Serial.begin(115200);
   
@@ -40,7 +49,7 @@ void setup() {
   M5.Lcd.setCursor(0, 0, 4);
   M5.Lcd.print("GreenPAK\n");
   M5.Lcd.print("Burner\n");
-  M5.Lcd.print("ver.0.3");
+  M5.Lcd.print("ver.0.4");
   delay(100);
 }
 
@@ -125,7 +134,7 @@ void requestSlaveAddress() {
     //Check for a valid slave address
     if (device_present[slave_address] == false)
     {
-      Serial.println(F("You entered an incorrect slave address. Submit slave address, 0-F: "));
+      Serial.println(F("\nYou entered an incorrect slave address."));
       continue;
     }
     else {
@@ -189,7 +198,7 @@ void PrintHex8(uint8_t data) {
 ////////////////////////////////////////////////////////////////////////////////
 // readChip 
 ////////////////////////////////////////////////////////////////////////////////
-int readChip(String NVMorEEPROM) {
+void readChip(String NVMorEEPROM) {
   int control_code = slave_address << 3;
 
   if (NVMorEEPROM == "NVM")
@@ -307,24 +316,33 @@ int writeChip(String NVMorEEPROM) {
   // http://www.gammon.com.au/progmem
 
   // Serial.println(F("New NVM data:"));
-  for (size_t i = 0; i < 16; i++)
-  {
-    // Pull current page NVM from PROGMEM and place into buffer
-    char buffer [64];
-    if (NVM_selected)
-    {
-      memcpy(buffer,&nvmData[i*43+9],32);
-    }
-    else if (EEPROM_selected)
-    {
-      memcpy(buffer,&eepromData[i*43+9],32);
-    }
 
-    for (size_t j = 0; j < 16; j++)
+  char buffer [64];
+  const char* pData;
+  uint16_t pos = 0;
+  uint16_t lenData;
+  if (NVM_selected || EEPROM_selected){
+    pData = NVM_selected ? nvmData : eepromData;
+    lenData = strlen(pData);
+    for (size_t i = 0; i < 16; i++)
     {
-      String temp = (String)buffer[2 * j] + (String)buffer[(2 * j) + 1];
-      long myNum = strtol(&temp[0], NULL, 16);
-      data_array[i][j] = (uint8_t) myNum;
+    // :を探す
+      while (pos < lenData && pData[pos] != ':') {
+        pos++;
+      }
+      if (lenData < (pos + 43)) {
+        Serial.println(F("Data size error!"));
+        break;
+      }
+      pos+=9;
+      memcpy(buffer,&pData[pos],32);
+
+      for (size_t j = 0; j < 16; j++)
+      {
+        String temp = (String)buffer[2 * j] + (String)buffer[(2 * j) + 1];
+        long myNum = strtol(&temp[0], NULL, 16);
+        data_array[i][j] = (uint8_t) myNum;
+      }
     }
   }
   Serial.println();
